@@ -123,6 +123,14 @@ def criar_contrato(request):
         return redirect('listar_contratos')
     return render(request, 'imobiliaria/contrato_form.html')
 
+def renovar_contrato(request, pk):
+    contrato = get_object_or_404(Contrato, pk=pk)
+    if request.method == 'POST':
+        contrato.data_fim = request.POST.get('data_fim')
+        contrato.save()
+        return redirect('detalhe_contrato', pk=contrato.pk)
+    return render(request, 'imobiliaria/renovar_contrato_form.html', {'contrato': contrato})
+
 def listar_visitas(request):
     visitas = Visita.objects.all()
     return render(request, 'imobiliaria/visitas_list.html', {'visitas': visitas})
@@ -187,3 +195,16 @@ def listar_pagamentos(request):
 def detalhe_pagamento(request, pk):
     pagamento = get_object_or_404(Pagamento, pk=pk)
     return render(request, 'imobiliaria/pagamento_detalhes.html', {'pagamento': pagamento})
+
+def criar_pagamento(request):
+    if request.method == 'POST':
+        pagamento = Pagamento(
+            contrato=get_object_or_404(Contrato, pk=request.POST.get('contrato')),
+            valor=request.POST.get('valor'),
+            data_pagamento=request.POST.get('data_pagamento'),
+            metodo_pagamento=request.POST.get('metodo_pagamento')
+        )
+        pagamento.save()
+        return redirect('listar_pagamentos')
+    return render(request, 'imobiliaria/pagamento_form.html')
+
